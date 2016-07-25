@@ -1,12 +1,34 @@
+import processing.core.*; 
+import processing.data.*; 
+import processing.event.*; 
+import processing.opengl.*; 
+
+import toxi.sim.grayscott.*; 
+import toxi.math.*; 
+import toxi.color.*; 
+import processing.pdf.*; 
+import java.io.File; 
+
+import java.util.HashMap; 
+import java.util.ArrayList; 
+import java.io.File; 
+import java.io.BufferedReader; 
+import java.io.PrintWriter; 
+import java.io.InputStream; 
+import java.io.OutputStream; 
+import java.io.IOException; 
+
+public class openNeuro extends PApplet {
+
 // Open NeuroImaging Lab Identity
 // Alex Norton 2016
 
-import toxi.sim.grayscott.*;
-import toxi.math.*;
-import toxi.color.*;
 
-import processing.pdf.*;
-import java.io.File; // Make Directory
+
+
+
+
+ // Make Directory
 
 int NUM_ITERATIONS = 10;
 int MAX_ITERATIONS = 5000;
@@ -26,7 +48,7 @@ float _k;
 float _dU;
 float _dV;
 
-void setup() {
+public void setup() {
 	size(512,512);
 
 	_counter++;
@@ -34,12 +56,12 @@ void setup() {
 
 	_id = "#" + 
 		str(
-			char(int(random(33,126))) +
-			char(int(random(33,126))) +
-			char(int(random(33,126))) +
-			char(int(random(33,126))) +
-			char(int(random(33,126))) +
-			char(int(random(33,126))) 
+			PApplet.parseChar(PApplet.parseInt(random(33,126))) +
+			PApplet.parseChar(PApplet.parseInt(random(33,126))) +
+			PApplet.parseChar(PApplet.parseInt(random(33,126))) +
+			PApplet.parseChar(PApplet.parseInt(random(33,126))) +
+			PApplet.parseChar(PApplet.parseInt(random(33,126))) +
+			PApplet.parseChar(PApplet.parseInt(random(33,126))) 
 		);
 
 	// Axial Brain Mask
@@ -76,12 +98,12 @@ void setup() {
 	// the first 2 parameters define the min/max values of the
 	// input range (Gray-Scott produces values in the interval of 0.0 - 0.5)
 	// setting the max = 0.33 increases the contrast
-	toneMap = new ToneMap(0,0.33,grad);
+	toneMap = new ToneMap(0,0.33f,grad);
 
 	gs.setRect(width/2, height/2,20,20);
 }
 
-void draw() {
+public void draw() {
 	if (mousePressed) {
 		gs.setRect(mouseX, mouseY,20,20);
 	}
@@ -97,7 +119,7 @@ void draw() {
 	}
 }
 
-void drawText() {
+public void drawText() {
 	fill(200);
 	
 	int leading = 25;
@@ -131,7 +153,7 @@ void drawText() {
 	popMatrix();
 }
 
-void runGrayScott(int iterations) {
+public void runGrayScott(int iterations) {
 	loadPixels();
 	
 	// update the simulation a few time steps
@@ -148,19 +170,19 @@ void runGrayScott(int iterations) {
 	updatePixels();
 }
 
-void outputSim() {
+public void outputSim() {
 	saveFrame("RD-" + _id + "_" + _counter + ".tga");
 }
 
 
-void saveVector() {
+public void saveVector() {
 	PGraphics tmp = null;
 	tmp = beginRecord(PDF, _counter + "_" + "GS." + ".pdf");
 		outputSim();
 	endRecord();
 }
 
-void drawSeed() {
+public void drawSeed() {
 	int seedWidth = seed.width;
 	int seedHeight = seed.height;
 	float x_offset = (width - seedWidth) / 2;
@@ -169,17 +191,17 @@ void drawSeed() {
 	image(seed, x_offset, y_offset);
 }
 
-void keyPressed() {
+public void keyPressed() {
 	gs.reset();
 	gs.setRect(width/2, height/2,20,20);
 }
 
 // Iterate through many many values of each
-void updateCoefficients() {
-	_f =  random(0.018, 0.025);
-	_k =  random(0.065, 0.085);
-	_dU = random(0.05, 0.2);
-	_dV = random(0.01, 0.1);
+public void updateCoefficients() {
+	_f =  random(0.018f, 0.025f);
+	_k =  random(0.065f, 0.085f);
+	_dU = random(0.05f, 0.2f);
+	_dV = random(0.01f, 0.1f);
 
 	// gs.setCoefficients(0.021,0.076,0.12,0.06);
 	// Coral --> [0.23, 0.76, 0.12, 0.06]
@@ -218,3 +240,12 @@ class PatternedGrayScott extends GrayScott {
 
 
 
+  static public void main(String[] passedArgs) {
+    String[] appletArgs = new String[] { "openNeuro" };
+    if (passedArgs != null) {
+      PApplet.main(concat(appletArgs, passedArgs));
+    } else {
+      PApplet.main(appletArgs);
+    }
+  }
+}
