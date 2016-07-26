@@ -10,6 +10,7 @@ import java.io.File; // Make Directory
 
 int NUM_ITERATIONS = 10;
 int MAX_ITERATIONS = 5000;
+int MAX_OUTPUT = 2;
 
 int _iteration;
 int _counter = 0;
@@ -30,6 +31,11 @@ void setup() {
 	size(512,512);
 
 	_counter++;
+
+	if (_counter >= MAX_OUTPUT) {
+		exit();
+	}
+
 	_iteration = 0;
 
 	_id = "#" + 
@@ -117,16 +123,16 @@ void drawText() {
 			pushMatrix();
 			translate(0, 10);
 				text("f:", inset, thirdLeading * 6);
-				text(_f, doubleInset, thirdLeading * 6);
+				text(str(_f), doubleInset, thirdLeading * 6);
 
 				text("k:", inset, thirdLeading * 7);
-				text(_k, doubleInset, thirdLeading * 7);
+				text(str(_k), doubleInset, thirdLeading * 7);
 
 				text("dU:", inset, thirdLeading * 8);
-				text(_dU, doubleInset, thirdLeading * 8);
+				text(str(_dU), doubleInset, thirdLeading * 8);
 
 				text("dV:", inset, thirdLeading * 9);
-				text(_dV, doubleInset, thirdLeading * 9);
+				text(str(_dV), doubleInset, thirdLeading * 9);
 			popMatrix();
 	popMatrix();
 }
@@ -181,6 +187,12 @@ void updateCoefficients() {
 		// _k =  random(0.065, 0.085);
 		// _dU = random(0.05, 0.2);
 		// _dV = random(0.01, 0.1);
+
+	// Test -->
+		// _f =  0.0245;
+		// _k =  0.0785;
+		// _dU = 0.0895;
+		// _dV = 0.0755;
 
 	// Cortical Folds 1 -->
 		// _f =  random(0.018, 0.025);
