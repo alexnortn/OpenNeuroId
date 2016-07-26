@@ -176,12 +176,30 @@ void keyPressed() {
 
 // Iterate through many many values of each
 void updateCoefficients() {
-	_f =  random(0.018, 0.025);
-	_k =  random(0.065, 0.085);
-	_dU = random(0.05, 0.2);
-	_dV = random(0.01, 0.1);
+	// Generation 1 -->
+		// _f =  random(0.018, 0.025);
+		// _k =  random(0.065, 0.085);
+		// _dU = random(0.05, 0.2);
+		// _dV = random(0.01, 0.1);
 
-	// gs.setCoefficients(0.021,0.076,0.12,0.06);
+	// Cortical Folds 1 -->
+		// _f =  random(0.018, 0.025);
+		// _k =  random(0.065, 0.08);
+		// _dU = random(0.05, 0.1);
+		// _dV = random(0.02, 0.1);
+
+	// Cortical Folds 1 Relative -->
+		// _f =  random(0.018, 0.025);
+		// _k =  _f * 3;
+		// _dU = random(0.05, 0.1);
+		// _dV = 0.75 * _dU;
+
+	// Cortical Folds 1 Relative -->
+		_f =  0.024 + random(-0.002, 0.001);
+		_k =  0.076 + random(-0.001, 0.002);
+		_dU = 0.085 + random(-0.005, 0.005);
+		_dV = 0.070 + random(-0.01, 0.01);		
+
 	// Coral --> [0.23, 0.76, 0.12, 0.06]
 	// Brain --> [0.2, 0.7, 0.12, 0.06]
 	// Electrons --> [0.23, 0.76, 0.12, 0.06]
