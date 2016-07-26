@@ -31,6 +31,7 @@ void setup() {
 	size(512,512);
 
 	_counter++;
+	println(_counter);
 
 	if (_counter >= MAX_OUTPUT) {
 		exit();
