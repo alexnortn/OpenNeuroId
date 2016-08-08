@@ -62,6 +62,12 @@ void setup() {
 	updateCoefficients();
 	
 	// f | k | dU | dV
+
+	// f  --> reactant f birth/introduction rate
+	// k  --> reactant k birth/introduction rate
+	// dU --> reactant f diffusion rate
+	// dV --> reactant k diffusion rate
+
 	gs.setCoefficients(_f, _k, _dU, _dV); // [20-23]
 
 	// Perhaps you could store the coefficients in a sort of object?
@@ -89,21 +95,36 @@ void setup() {
 }
 
 void draw() {
-	if (mousePressed) {
-		gs.setRect(mouseX, mouseY,20,20);
-	}
+	// if (mousePressed) {
+	// 	gs.setRect(mouseX, mouseY,20,20);
+	// }
+
+	image(seed, 0, 0);
 
 	runGrayScott(NUM_ITERATIONS);
 	_iteration += NUM_ITERATIONS;
 
-	drawText();
 
-	if (_iteration >= MAX_ITERATIONS) {
-		outputSim();
-		setup();
+	loadPixels();
+
+	// Edge Detection
+	for (int x = 1; x < width-1; x++) { // Start in from edges
+		for (int y = 1; y < height-1; y++) { // Start in from edges
+			int index = x + width * y;
+			pixels[index] = edgeDetector(x, y);
+		}
 	}
 
-	println(frameCount);
+	updatePixels();
+
+	// drawText();
+
+	// if (_iteration >= MAX_ITERATIONS) {
+	// 	outputSim();
+	// 	setup();
+	// }
+
+	// println(frameCount);
 
 }
 
@@ -146,12 +167,11 @@ void runGrayScott(int iterations) {
 	
 	// update the simulation a few time steps
 	for(int i = 0; i < iterations; i++) {
-		// if (i % 10 == 0) { println("tick " + i); }
 		gs.update(1);
 	}
 	// read out the V result array
 	// and use tone map to render colours
-	for(int i = 0; i < gs.v.length; i++) {
+	for (int i = 0; i < gs.v.length; i++) {
 		pixels[i] = toneMap.getARGBToneFor(gs.v[i]);
 	}
 
@@ -185,59 +205,18 @@ void keyPressed() {
  
 // Iterate through many many values of each
 void updateCoefficients() {
-	// Generation 1 -->
-		// _f =  random(0.018, 0.025);
-		// _k =  random(0.065, 0.085);
-		// _dU = random(0.05, 0.2);
-		// _dV = random(0.01, 0.1);
-
-	// Test 1 -->
-		// _f =  0.023926012 + random(-0.001, 0.001);
-		// _k =  0.07535519 + random(-0.001, 0.001);
-		// _dU = 0.08397207 + random(-0.001, 0.001);
-		// _dV = 0.06376554 + random(-0.001, 0.001);
-
-	// Test 2 -->
-		// _f =  0.022347642 + random(-0.0001, 0.0001);
-		// _k =  0.07537834 + random(-0.0001, 0.0001);
-		// _dU = 0.08807717 + random(-0.0001, 0.0001);
-		// _dV = 0.061769232 + random(-0.0001, 0.0001);
 
 	// Cortex 1 -->
-	// _f =  0.022;
-	// _k =  0.074;
-	// _dU = 0.229;
-	// _dV = 0.1;
+	_f =  0.022;
+	_k =  0.074;
+	_dU = 0.229;
+	_dV = 0.1;
 
 	// Left / Right Brain -->
-	_f =  0.021886185 + random(-0.01, 0.01);
-	_k =  0.073436916 + random(-0.01, 0.01);
-	_dU = 0.20551047 + random(-0.01, 0.01);
-	_dV = 0.09671787 + random(-0.01, 0.01);
-
-	// Cortical Folds 2 -->
-	// _f =  0.022 + random(-0.0001, 0.0001);
-	// _k =  0.074 + random(-0.0001, 0.0001);
-	// _dU = 0.206 + random(-0.0001, 0.0001);
-	// _dV = 0.097 + random(-0.0001, 0.0001);
-
-	// Cortical Folds 1 -->
-		// _f =  random(0.018, 0.025);
-		// _k =  random(0.065, 0.08);
-		// _dU = random(0.05, 0.1);
-		// _dV = random(0.02, 0.1);
-
-	// Cortical Folds 1 Relative -->
-		// _f =  random(0.018, 0.025);
-		// _k =  _f * 3;
-		// _dU = random(0.05, 0.1);
-		// _dV = 0.75 * _dU;
-
-	// Cortical Folds 1 Relative -->
-		// _f =  0.024 + random(-0.002, 0.001);
-		// _k =  0.076 + random(-0.001, 0.002);
-		// _dU = 0.085 + random(-0.005, 0.005);
-		// _dV = 0.070 + random(-0.01, 0.01);		
+	// _f =  0.021886185 + random(-0.01, 0.01);
+	// _k =  0.073436916 + random(-0.01, 0.01);
+	// _dU = 0.20551047 + random(-0.01, 0.01);
+	// _dV = 0.09671787 + random(-0.01, 0.01);	
 
 	// Coral --> [0.23, 0.76, 0.12, 0.06]
 	// Brain --> [0.2, 0.7, 0.12, 0.06]
@@ -248,10 +227,54 @@ void updateCoefficients() {
 //---------
 // Consider simple blob detection algorithm for turning the pixel concentrations
 // into a vector
-// + Given Minimum area
-// + Find blob
-// + Draw points in center a regular intervals
-// + Connect into polyline
+
+// Based on Sobel Operator
+// https://en.wikipedia.org/wiki/Sobel_operator
+
+color edgeDetector(int x, int y) {
+	int matrixsize = 3;
+	int offset = matrixsize / 2;
+
+  	// Detect horizontal lines
+	float[][] kernelx = { { -1, 0, 1 },
+	                      { -2, 0, 2 },
+	                      { -1, 0, 1 }}; 
+
+  	// Detect vertical lines
+	float[][] kernely = {{ -1, -2, -1 },
+	                      { 0,  0,  0 },
+	                      { 1,  2,  1 }}; 
+
+  	// Calculate magnitude for X
+  	float magX = 0.0;
+
+  	for (int a = 0; a < matrixsize; a++) {
+  		for (int b = 0; b < matrixsize; b++) {
+  			int xn = x + a - offset;
+  			int yn = y + b - offset; 
+
+  			int index = xn + yn * width;
+
+  			magX += pixels[index] * kernelx[a][b];
+  		}
+  	}
+
+  	// Calculate magnitude for Y
+  	float magY = 0.0;
+
+  	for (int a = 0; a < matrixsize; a++) {
+  		for (int b = 0; b < matrixsize; b++) {
+  			int xn = x + a - offset;
+  			int yn = y + b - offset;
+
+  			int index = xn + yn * width;
+
+  			magY += pixels[index] * kernely[a][b];
+  		}
+  	}
+
+  	return color( sqrt(magX*magX + magY*magY) ); // pixel output
+}
 
 class PatternedGrayScott extends GrayScott {
 	public PatternedGrayScott(int w, int h, boolean tiling) {
@@ -259,7 +282,7 @@ class PatternedGrayScott extends GrayScott {
 	}
 
 	public float getFCoeffAt(int x, int y) { // F
-		int index = width * y + x;
+		int index = x + width * y;
 		if ( red(seed.pixels[index]) == 255 ) {
 			return 0;  
 		}
