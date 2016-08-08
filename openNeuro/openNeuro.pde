@@ -9,8 +9,8 @@ import processing.pdf.*;
 import java.io.File; // Make Directory
 
 int NUM_ITERATIONS = 10;
-int MAX_ITERATIONS = 5000;
-int MAX_OUTPUT = 2;
+int MAX_ITERATIONS = 10000;
+int MAX_OUTPUT = 50;
 
 int _iteration;
 int _counter = 0;
@@ -50,7 +50,7 @@ void setup() {
 		);
 
 	// Axial Brain Mask
-	seed = loadImage("brain9.png");
+	seed = loadImage("brain18.png");
 	seed.loadPixels();
 
 	// Typography
@@ -102,6 +102,9 @@ void draw() {
 		outputSim();
 		setup();
 	}
+
+	println(frameCount);
+
 }
 
 void drawText() {
@@ -177,10 +180,9 @@ void drawSeed() {
 }
 
 void keyPressed() {
-	gs.reset();
-	gs.setRect(width/2, height/2,20,20);
+	setup();
 }
-
+ 
 // Iterate through many many values of each
 void updateCoefficients() {
 	// Generation 1 -->
@@ -189,11 +191,35 @@ void updateCoefficients() {
 		// _dU = random(0.05, 0.2);
 		// _dV = random(0.01, 0.1);
 
-	// Test -->
-		// _f =  0.0245;
-		// _k =  0.0785;
-		// _dU = 0.0895;
-		// _dV = 0.0755;
+	// Test 1 -->
+		// _f =  0.023926012 + random(-0.001, 0.001);
+		// _k =  0.07535519 + random(-0.001, 0.001);
+		// _dU = 0.08397207 + random(-0.001, 0.001);
+		// _dV = 0.06376554 + random(-0.001, 0.001);
+
+	// Test 2 -->
+		// _f =  0.022347642 + random(-0.0001, 0.0001);
+		// _k =  0.07537834 + random(-0.0001, 0.0001);
+		// _dU = 0.08807717 + random(-0.0001, 0.0001);
+		// _dV = 0.061769232 + random(-0.0001, 0.0001);
+
+	// Cortex 1 -->
+	// _f =  0.022;
+	// _k =  0.074;
+	// _dU = 0.229;
+	// _dV = 0.1;
+
+	// Left / Right Brain -->
+	_f =  0.021886185 + random(-0.01, 0.01);
+	_k =  0.073436916 + random(-0.01, 0.01);
+	_dU = 0.20551047 + random(-0.01, 0.01);
+	_dV = 0.09671787 + random(-0.01, 0.01);
+
+	// Cortical Folds 2 -->
+	// _f =  0.022 + random(-0.0001, 0.0001);
+	// _k =  0.074 + random(-0.0001, 0.0001);
+	// _dU = 0.206 + random(-0.0001, 0.0001);
+	// _dV = 0.097 + random(-0.0001, 0.0001);
 
 	// Cortical Folds 1 -->
 		// _f =  random(0.018, 0.025);
@@ -208,10 +234,10 @@ void updateCoefficients() {
 		// _dV = 0.75 * _dU;
 
 	// Cortical Folds 1 Relative -->
-		_f =  0.024 + random(-0.002, 0.001);
-		_k =  0.076 + random(-0.001, 0.002);
-		_dU = 0.085 + random(-0.005, 0.005);
-		_dV = 0.070 + random(-0.01, 0.01);		
+		// _f =  0.024 + random(-0.002, 0.001);
+		// _k =  0.076 + random(-0.001, 0.002);
+		// _dU = 0.085 + random(-0.005, 0.005);
+		// _dV = 0.070 + random(-0.01, 0.01);		
 
 	// Coral --> [0.23, 0.76, 0.12, 0.06]
 	// Brain --> [0.2, 0.7, 0.12, 0.06]
