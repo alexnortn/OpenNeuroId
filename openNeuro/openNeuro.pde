@@ -51,7 +51,7 @@ void setup() {
 		);
 
 	// Axial Brain Mask
-	seed = loadImage("test.png");
+	seed = loadImage("brain18.png");
 	seed.loadPixels();
 
 	convolution = createImage(seed.width, seed.height, RGB);
@@ -98,41 +98,20 @@ void setup() {
 }
 
 void draw() {
-	// if (mousePressed) {
-	// 	gs.setRect(mouseX, mouseY,20,20);
-	// }
+	if (mousePressed) {
+		gs.setRect(mouseX, mouseY,20,20);
+	}
 
-	// image(seed, 0, 0);
-
-	// // runGrayScott(NUM_ITERATIONS);
-	// // _iteration += NUM_ITERATIONS;
+	runGrayScott(NUM_ITERATIONS);
+	_iteration += NUM_ITERATIONS;
 
 
-	// loadPixels();
+	drawText();
 
-	// // Edge Detection
-	// for (int x = 1; x < width-1; x++) { // Start in from edges
-	// 	for (int y = 1; y < height-1; y++) { // Start in from edges
-	// 		int index = x + width * y;
-	// 		pixels[index] = edgeDetector(x, y);
-	// 	}
-	// } 
-
-	// updatePixels();
-
-	thresholdDetector();
-
-	noLoop(); 
-
-	// drawText();
-
-	// if (_iteration >= MAX_ITERATIONS) {
-	// 	outputSim();
-	// 	setup();
-	// }
-
-	// println(frameCount);
-
+	if (_iteration >= MAX_ITERATIONS) {
+		outputSim();
+		setup();
+	}
 }
 
 void drawText() {
