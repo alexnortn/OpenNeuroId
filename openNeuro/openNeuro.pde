@@ -20,6 +20,7 @@ GrayScott gs;
 ToneMap toneMap;
 
 PImage seed;
+PImage convolution;
 PFont metaFont;
 
 float _f;
@@ -50,8 +51,10 @@ void setup() {
 		);
 
 	// Axial Brain Mask
-	seed = loadImage("brain18.png");
+	seed = loadImage("test.png");
 	seed.loadPixels();
+
+	convolution = createImage(seed.width, seed.height, RGB);
 
 	// Typography
 	metaFont = createFont("PostGrotesk-Medium.otf", 12);
@@ -99,23 +102,27 @@ void draw() {
 	// 	gs.setRect(mouseX, mouseY,20,20);
 	// }
 
-	image(seed, 0, 0);
+	// image(seed, 0, 0);
 
-	runGrayScott(NUM_ITERATIONS);
-	_iteration += NUM_ITERATIONS;
+	// // runGrayScott(NUM_ITERATIONS);
+	// // _iteration += NUM_ITERATIONS;
 
 
-	loadPixels();
+	// loadPixels();
 
-	// Edge Detection
-	for (int x = 1; x < width-1; x++) { // Start in from edges
-		for (int y = 1; y < height-1; y++) { // Start in from edges
-			int index = x + width * y;
-			pixels[index] = edgeDetector(x, y);
-		}
-	}
+	// // Edge Detection
+	// for (int x = 1; x < width-1; x++) { // Start in from edges
+	// 	for (int y = 1; y < height-1; y++) { // Start in from edges
+	// 		int index = x + width * y;
+	// 		pixels[index] = edgeDetector(x, y);
+	// 	}
+	// } 
 
-	updatePixels();
+	// updatePixels();
+
+	thresholdDetector();
+
+	noLoop(); 
 
 	// drawText();
 
@@ -224,11 +231,33 @@ void updateCoefficients() {
 	// gs.setCoefficients(0.0077,0.0649,0.1,0.03); // Mitosis
 }
 
-//---------
-// Consider simple blob detection algorithm for turning the pixel concentrations
-// into a vector
+void thresholdDetector() {
+	seed.loadPixels();
+	convolution.loadPixels();
+	int threshold = 150;
 
-// Based on Sobel Operator
+	for (int x = 0; x < seed.width; x++) {
+		for (int y = 0; y < seed.height; y++ ) {
+			int loc = x + y * seed.width;
+			// Test the brightness against the threshold
+			if (brightness(seed.pixels[loc]) > threshold) {
+				convolution.pixels[loc]  = color(255);  // White
+			} 
+			else {
+				convolution.pixels[loc]  = color(0);    // Black
+			}
+		}
+	}
+
+	// We changed the pixels in convolution
+	convolution.updatePixels();
+	// Display the convolution
+	image(convolution,0,0);
+}
+
+// Centerline extraction
+
+// Based on Sobel Operator --> Swap out for Canny Convolution
 // https://en.wikipedia.org/wiki/Sobel_operator
 
 color edgeDetector(int x, int y) {
@@ -255,7 +284,7 @@ color edgeDetector(int x, int y) {
 
   			int index = xn + yn * width;
 
-  			magX += pixels[index] * kernelx[a][b];
+  			magX += greyValue(pixels[index]) * kernelx[a][b];
   		}
   	}
 
@@ -269,11 +298,22 @@ color edgeDetector(int x, int y) {
 
   			int index = xn + yn * width;
 
-  			magY += pixels[index] * kernely[a][b];
+  			magY += greyValue(pixels[index]) * kernely[a][b];
   		}
   	}
 
   	return color( sqrt(magX*magX + magY*magY) ); // pixel output
+}
+
+int greyValue(color c) {
+	
+	int r = (c&0x00FF0000) >> 16; // red part
+	int g = (c&0x0000FF00) >> 8;  // green part
+	int b = (c&0x000000FF); 	  // blue part
+	
+	int grey = (r+b+g)/3;		  // grey part
+
+	return grey;
 }
 
 class PatternedGrayScott extends GrayScott {
